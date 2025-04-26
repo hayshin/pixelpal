@@ -30,7 +30,7 @@
 
 		while (true) {
 			if (color) drawPixel({ x: x0, y: y0, color });
-			else drawBackPixel({ x: x0, y: y0 });
+			else drawBackBrush({ x: x0, y: y0 });
 			if (x0 === x1 && y0 === y1) break;
 
 			const e2 = 2 * err;
@@ -72,8 +72,15 @@
 		);
 	}
 
+	function drawBackBrush(coords: Coords) {
+		for (let x = coords.x; x < coords.x + brushSize; x++) {
+			for (let y = coords.y; y < coords.y + brushSize; y++) {
+				drawBackPixel({ x, y });
+			}
+		}
+	}
+
 	function drawBackPixel(coords: Coords) {
-		console.log(coords);
 		ctx.fillStyle = '#555555';
 		ctx.fillRect(coords.x * pixelSize, coords.y * pixelSize, pixelSize / 2, pixelSize / 2);
 		ctx.fillStyle = '#555555';
@@ -103,11 +110,13 @@
 	function handleRightClick(event: MouseEvent) {
 		event.preventDefault();
 		const { x, y } = getPixelCoords(event);
-		drawBackPixel({ x, y });
+		drawBackBrush({ x, y });
 	}
 
 	function handleLeftClick(event: MouseEvent) {
-		const { x, y } = getCanvasCoords(event);
+
+		const { x, y } = getPixelCoords(event);
+		console.log(x, y);
 		drawPixel({ x, y, color: brushColor });
 	}
 
@@ -126,9 +135,8 @@
 					drawLine(prevCoords.x, prevCoords.y, pixelCoords.x, pixelCoords.y, brushColor);
 				else drawPixel({ x: pixelCoords.x, y: pixelCoords.y, color: brushColor });
 			} else if (isErasing) {
-				if (prevCoords)
-					drawLine(prevCoords.x, prevCoords.y, pixelCoords.x, pixelCoords.y );
-				else drawBackPixel({ x: pixelCoords.x, y: pixelCoords.y});
+				if (prevCoords) drawLine(prevCoords.x, prevCoords.y, pixelCoords.x, pixelCoords.y);
+				else drawBackBrush({ x: pixelCoords.x, y: pixelCoords.y });
 			}
 			prevCoords = pixelCoords;
 		}
