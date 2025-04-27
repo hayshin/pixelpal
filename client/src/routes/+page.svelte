@@ -1,18 +1,10 @@
-<script lang="ts">
-	import { api } from '$lib/eden';
-	let a = 0;
-	let b = 0;
-	let total = 0;
-
-	async function add() {
-		const{ data, status } = await api.add.post({ a, b });
-		if (data && status == 200) total = data.total;
-	}
-
+<script>
+  import PixelCanvas from "./PixelCanvas.svelte";
+  let color = '#ff0000';
+  let size = 1;
 </script>
 
-<input type="number" bind:value={a} /> +
-<input type="number" bind:value={b} /> =
-{total}
+<input type="color" bind:value={color} />
+<input type="number" bind:value={size} min="1" max="10" />
 
-<button onclick={add}>Calculate</button>
+<PixelCanvas width={64} height={64} bind:brushColor={color} bind:brushSize={size} />
