@@ -11,9 +11,10 @@
   env.GREET = "devenv";
 
   # https://devenv.sh/packages/
-  packages = [
-    pkgs.git
-    pkgs.svelte-language-server
+  packages = with pkgs; [
+    git
+    svelte-language-server
+    sqlite
   ];
 
   # https://devenv.sh/languages/
@@ -21,8 +22,10 @@
     javascript = {
       enable = true;
       pnpm.enable = true;
+      bun.enable = true;
     };
     typescript.enable = true;
+    rust.enable = true;
   };
 
   # https://devenv.sh/processes/
@@ -32,9 +35,17 @@
   # services.postgres.enable = true;
 
   # https://devenv.sh/scripts/
-  scripts.hello.exec = ''
-    echo hello from $GREET
-  '';
+  scripts = {
+    "client run".exec = ''
+      pnpm run dev
+    '';
+    "server run".exec = ''
+      cargo run
+    '';
+    hello.exec = ''
+      echo hello from $GREET
+    '';
+  };
 
   enterShell = ''
     hello
