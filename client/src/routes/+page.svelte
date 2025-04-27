@@ -1,14 +1,11 @@
 <script lang="ts">
-	import { treaty } from '@elysiajs/eden';
-	import type { App } from './api/+server';
+	import { api } from '$lib/eden';
 	let a = 0;
 	let b = 0;
 	let total = 0;
-	const app = treaty<App>('localhost:5173');
-
 
 	async function add() {
-		const{ data, status } = await app.api.add.post({ a, b });
+		const{ data, status } = await api.add.post({ a, b });
 		if (data && status == 200) total = data.total;
 	}
 
