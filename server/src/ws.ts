@@ -6,13 +6,13 @@ export const websocket = new Elysia()
   .ws('/canvases', {
     body: Pixel,
     message(ws, pixel) {
-      ws.publish("porno", pixel);
+      ws.publish("a", pixel);
     },
     open(ws) {
-      ws.subscribe("porno");
+      ws.subscribe("a");
     },
     close(ws) {
-      ws.unsubscribe("porno")
+      ws.unsubscribe("a")
     }
   }
   )
