@@ -28,6 +28,7 @@ export const Art = t.Object({
   height: t.Number(),
   title: t.String(),
   owner: t.String(),
+  created: t.Date(),
   board: Board,
 })
 export type Art = Static<typeof Art>
