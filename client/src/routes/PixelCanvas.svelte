@@ -1,6 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { Point, Pixel } from "$shared/types";
+  import type { Point, Pixel } from "../../../shared/types";
+  import { api } from "$lib/eden";
+
   export let width = 64;
   export let height = 64;
   const pixelSize = 8;
@@ -10,6 +12,8 @@
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
   let prevPoint: Point;
+  let room: ReturnType<typeof api['canvases']['subscribe']>;
+
 
   function drawLine(point1: Point, point2: Point, color?: string) {
     let dx = Math.abs(point2.x - point1.x);
@@ -53,6 +57,8 @@
 
   function drawPixel(pixel: Pixel) {
     // console.log(x, y)
+    if (pixel == prevPoint) return;
+    if (room) room.send(pixel);
     if (!pixel.color) {
       clearPixel(pixel);
       return;
@@ -72,7 +78,6 @@
     firstColor = "#545454",
     secondColor = "#4C4C4C",
   ) {
-    console.log(point);
     const halfPixelSize = pixelSize / 2;
     for (let x = point.x; x < point.x + brushSize; x++) {
       for (let y = point.y; y < point.y + brushSize; y++) {
@@ -153,6 +158,11 @@
         clearPixel({ x, y });
       }
     }
+    room = api.canvases.subscribe();
+    room.on('message', ({data}) => {
+      drawPixel(data);
+    })
+    console.log(room);
   });
 </script>
 

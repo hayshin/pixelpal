@@ -2,6 +2,8 @@ import { Elysia, t } from 'elysia';
 import swagger from '@elysiajs/swagger';
 import cors from '@elysiajs/cors';
 import { add } from './add';
+import { websocket } from './ws';
+import {treaty} from '@elysiajs/eden';
 // import { add } from '$lib/add';
 
 const app = new Elysia()
@@ -15,7 +17,8 @@ const app = new Elysia()
 
   ))
   .use(swagger())
-  .use(add).
-  listen(8080);
+  .use(add)
+  .use(websocket)
+  .listen(process.env.PORT ?? 3000);
 
 export type App = typeof app;

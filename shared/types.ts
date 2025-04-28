@@ -1,12 +1,52 @@
-export type Point = {
-  x: number;
-  y: number;
-};
+import type {Static } from "elysia";
+import {t} from "elysia";
 
-export type Pixel = Point & {
-  color?: string; // Optional color
-};
-export type Board = Pixel[][];
+// TypeBox types for Elysia & Eden type system
+export const Color = t.MaybeEmpty(t.String());
+export type Color = Static<typeof Color>
+
+export const Point = t.Object({
+  x: t.Number(),
+  y: t.Number()
+})
+export type Point = Static<typeof Point>
+
+export const Pixel = t.Intersect([
+  Point,
+  t.Object({
+    color: Color
+  })
+])
+
+export type Pixel = Static<typeof Pixel>
+
+
+export class Board {
+  width: number;
+  height: number;
+  board: Color[][];
+  constructor(width: number, height: number) {
+    this.width = width;
+    this.height = height;
+    this.board = Array.from({ length: width }, () =>
+      Array.from({ length: height })
+    );
+  }
+  setPixel(pixel: Pixel) {
+    this.board[pixel.x][pixel.y] = pixel.color;
+  }
+
+  toJSON(): string {
+    return JSON.stringify(this.board);
+  }
+
+  static fromJSON(json: string): Board {
+    let array = JSON.parse(json);
+    let board = new Board(array[0].size, array.size);
+    board.board = array;
+    return board;
+  }
+}
 
 export type DrawPixel = {
   type: "draw_pixel";
