@@ -20,33 +20,48 @@ export const Pixel = t.Intersect([
 
 export type Pixel = Static<typeof Pixel>
 
+export const Board = t.Array(t.Array(Color));
+export type Board = Static<typeof Board>
 
-export class Board {
-  width: number;
-  height: number;
-  board: Color[][];
-  constructor(width: number, height: number) {
-    this.width = width;
-    this.height = height;
-    this.board = Array.from({ length: width }, () =>
-      Array.from({ length: height })
-    );
-  }
-  setPixel(pixel: Pixel) {
-    this.board[pixel.x][pixel.y] = pixel.color;
-  }
+export const Art = t.Object({
+  width: t.Number(),
+  height: t.Number(),
+  title: t.String(),
+  owner: t.String(),
+  board: Board,
+})
+export type Art = Static<typeof Art>
 
-  toJSON(): string {
-    return JSON.stringify(this.board);
-  }
+// export class Art {
+//   width: number;
+//   height: number;
+//   title: string;
+//   owner: string;
+//   board: Board;
+//   constructor(width: number, height: number, title: string, owner: string) {
+//     this.width = width;
+//     this.height = height;
+//     this.board = Array.from({ length: width }, () =>
+//       Array.from({ length: height })
+//     );
+//     this.title = title;
+//     this.owner = owner;
+//   }
+//   setPixel(pixel: Pixel) {
+//     this.board[pixel.x][pixel.y] = pixel.color;
+//   }
 
-  static fromJSON(json: string): Board {
-    let array = JSON.parse(json);
-    let board = new Board(array[0].size, array.size);
-    board.board = array;
-    return board;
-  }
-}
+//   toJSON(): string {
+//     return JSON.stringify(this.board);
+//   }
+
+//   // static fromJSON(json: string): Art {
+//   //   let array = JSON.parse(json);
+//   //   let board = new Art(array[0].size, array.size);
+//   //   board.board = array;
+//   //   return board;
+//   // }
+// }
 
 export type DrawPixel = {
   type: "draw_pixel";
@@ -74,7 +89,7 @@ export type UserLeave = {
 
 export type SendBoard = {
   type: "send_board";
-  board: Board;
+  board: Art;
 };
 
 // You might also want to export a union type of all message types

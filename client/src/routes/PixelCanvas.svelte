@@ -5,6 +5,8 @@
 
   export let width = 64;
   export let height = 64;
+  export let userName = "anon";
+  export let canvasId = "aboba";
   const pixelSize = 8;
   export let brushColor = "#000000";
   export let brushSize = 1;
@@ -158,7 +160,14 @@
         clearPixel({ x, y });
       }
     }
-    room = api.canvases.subscribe();
+    console.log(canvasId, userName);
+    room = api.canvases.subscribe({
+      query: {
+        canvasId,
+        userName
+      }
+    });
+    console.log(canvasId, userName);
     room.on('message', ({data}) => {
       drawPixel(data);
     })

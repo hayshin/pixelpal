@@ -1,18 +1,27 @@
-import { Elysia } from "elysia";
+import { Elysia, t } from "elysia";
 import { Pixel } from "@shared/types";
 
 
 export const websocket = new Elysia()
   .ws('/canvases', {
     body: Pixel,
-    message(ws, pixel) {
-      ws.publish("a", pixel);
+    query: t.Object({
+      canvasId: t.String(), // canvas id
+      userName: t.String(), // user name
+    }),
+    message(ws, pixel: Pixel) {
+      const { canvasId, userName } = ws.data.query;
+      console.log(canvasId, userName);
+      ws.publish(canvasId, pixel);
     },
     open(ws) {
-      ws.subscribe("a");
+      const { canvasId, userName } = ws.data.query;
+      console.log(canvasId, userName);
+      ws.subscribe(canvasId);
     },
     close(ws) {
-      ws.unsubscribe("a")
+      const { canvasId, userName } = ws.data.query;
+      ws.unsubscribe(canvasId)
     }
   }
   )
