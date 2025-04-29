@@ -1,6 +1,10 @@
 <script lang=ts>
   import { api } from "$lib/eden";
-  let {userName=$bindable(), show = $bindable()} = $props();
+  let {userName=$bindable(), show = $bindable(), handleArtJoin}: {
+    userName: string,
+    show: boolean,
+    handleArtJoin(canvasId: string): void;
+  } = $props();
   let artLink = $state(''); // Предполагаем, что пользователь введет ссылку или ID
 
   function handleSubmit() {
@@ -8,7 +12,8 @@
       // Извлекаем ID из ссылки. Простая реализация: предполагаем, что ID в конце URL
       const parts = artLink.split('/');
       const artId = parts[parts.length - 1]; // Получаем последний сегмент
-      api.arts.get({query: {artId, userName}})
+      // api.arts.get({query: {artId, userName}})
+      handleArtJoin(artId);
       if (artId) {
         artLink = ''; // Сброс формы
       } else {

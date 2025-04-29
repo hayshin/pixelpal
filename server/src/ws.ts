@@ -1,61 +1,107 @@
 import { Elysia, t } from "elysia";
 import { Art, Pixel, Board } from "@shared/types";
-import { api } from "@client/src/lib/eden";
-
 import { db } from "./db/db";
-import { sql, eq, inArray } from "drizzle-orm";
-import { arts, usersArts } from "./db/schema";
+import { eq } from "drizzle-orm";
+import { arts } from "./db/schema";
+import cors from "@elysiajs/cors";
+import type { ElysiaWS } from "elysia/ws";
 
 let boards = new Map<string, Board>();
-let active_users = new Map<string, number>();
+let activeConnections = new Map<string, Set<string>>();
 
 export const websocket = new Elysia()
+  // Configure CORS properly
+  .use(cors({
+    origin: true,
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type'],
+    credentials: true
+  }))
+  // Handle preflight requests
+  .options('*', ({ set }) => {
+    set.headers = {
+      // ...set.headers,
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type'
+    };
+  })
   .ws('/canvases', {
-    body: Pixel,
+    // Enable CORS for WebSocket
+    beforeHandle({ set }) {
+      set.headers['Access-Control-Allow-Origin'] = '*';
+    },
+    body: t.Object({
+      x: t.Number(),
+      y: t.Number(),
+      color: t.String()
+    }),
     query: t.Object({
-      artId: t.String(), // canvas id
-      userName: t.String(), // user name
+      artId: t.String(),
+      userName: t.String()
     }),
-    response: t.Object({
-      pixel: t.MaybeEmpty(Pixel),
-      board: t.MaybeEmpty(Board),
-    }),
-    message(ws, pixel) {
+    open(ws) {
       const { artId, userName } = ws.data.query;
-      console.log(artId, userName);
+
+      // Initialize connection tracking
+      if (!activeConnections.has(artId)) {
+        activeConnections.set(artId, new Set());
+      }
+      activeConnections.get(artId)?.add(ws.id);
+
+      // Send current board state
       if (boards.has(artId)) {
-        let board = boards.get(artId);
-        if (board) board[pixel.x][pixel.y] = pixel.color;
-      }
-      ws.publish(artId, { pixel: pixel, board: null });
-    },
-    async open(ws) {
-      const { artId, userName } = ws.data.query;
-      if (!boards.has(artId)) {
-        const art: Art = (await db.select().from(arts).where(eq(arts.id, artId)).limit(1))[0];
-        if (art) {
-          boards.set(artId, art.board);
-          ws.send({pixel: null, board: art.board});
-        }
+        ws.send({ pixel: null, board: boards.get(artId) });
       } else {
-        ws.send({pixel: null, board: boards.get(artId)});
+        // Load from database if not in memory
+        db.select().from(arts).where(eq(arts.id, artId))
+          .then(([art]) => {
+            if (art) {
+              boards.set(artId, art.board);
+              ws.send({ pixel: null, board: art.board });
+            }
+          })
+          .catch(console.error);
       }
-      active_users.set(artId, (active_users.get(artId) || 0) + 1)
-      console.log(artId, userName);
+
+      console.log(`User ${userName} connected to art ${artId}`);
       ws.subscribe(artId);
-
     },
-    async close(ws) {
+    message(ws, pixel: Pixel) {
       const { artId, userName } = ws.data.query;
-      ws.unsubscribe(artId)
-      active_users.set(artId, (active_users.get(artId) || 0) - 1);
-      if ((active_users.get(artId) || 0) < 1) {
-        active_users.delete(artId);
-        await db.update(arts).set({ board: boards.get(artId) }).where(eq(arts.id, artId));
-        boards.delete(artId);
+
+      // Update board state
+      if (!boards.has(artId)) return;
+
+      const board = boards.get(artId);
+      if (board && board[pixel.x]?.[pixel.y] !== undefined) {
+        board[pixel.x][pixel.y] = pixel.color;
+        ws.publish(artId, { pixel, board: null });
       }
+    },
+    close(ws) {
+      const { artId, userName } = ws.data.query;
+
+      // Clean up connection tracking
+      if (activeConnections.has(artId)) {
+        const connections = activeConnections.get(artId);
+        connections?.delete(ws.id);
+
+          console.log("Trying to update board ", connections?.size)
+        if (connections?.size === 0) {
+          // Save to database when last connection closes
+          console.log("Trying to update board ", artId)
+          db.update(arts)
+            .set({ board: boards.get(artId) })
+            .where(eq(arts.id, artId))
+            .catch(console.error);
+
+          activeConnections.delete(artId);
+          boards.delete(artId);
+        }
+      }
+
+      console.log(`User ${userName} disconnected from art ${artId}`);
+      ws.unsubscribe(artId);
     }
-  }
-  )
-
-
+  });

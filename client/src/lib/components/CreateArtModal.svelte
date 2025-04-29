@@ -1,6 +1,10 @@
-<script>
-  let {userName=$bindable(), show = $bindable()} = $props();
-  import { api } from "$lib/eden";
+<script lang=ts>
+  // import { api } from "$lib/eden";
+  let {userName=$bindable(), show = $bindable(), handleArtCreate}: {
+    userName: string;
+    show: boolean;
+    handleArtCreate(title:string, width:number, height:number): void;
+  } = $props();
 
   let title = $state('');
   let width = $state(64);
@@ -8,9 +12,10 @@
 
   function handleSubmit() {
     if (title && width > 0 && height > 0) {
-      api.arts.post({
-        title, width, height, userName
-      })
+      // api.arts.post({
+      //   title, width, height, userName
+      // })
+      handleArtCreate(title, width, height)
       title = ''; // Сброс формы
       width = 64;
       height = 64;
@@ -18,7 +23,7 @@
   }
 
   function handleClose() {
-  show=false;
+    show=false;
   }
 </script>
 

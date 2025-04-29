@@ -4,6 +4,7 @@ import { sql, eq, inArray } from "drizzle-orm";
 import { arts, usersArts } from "./db/schema";
 import { Art, Board, Color } from "@shared/types";
 import { v4 as uuidv4 } from 'uuid';
+import cors from "@elysiajs/cors";
 
 function createMatrix<T>(width: number, height: number, value: T): T[][] {
   // Создаем внешний массив (строки)
@@ -15,14 +16,16 @@ function createMatrix<T>(width: number, height: number, value: T): T[][] {
   return matrix;
 }
 
-export const art = new Elysia()
+export const art = new Elysia().use(cors({
+  origin: true,
+}))
   .post('/arts', async ({ body }) => {
     const id = uuidv4();
     let board: Board = createMatrix(body.width, body.height, null);
     const result = await db.insert(arts).values({ id: id, title: body.title, height: body.height, width: body.width, owner: body.userName, creater: body.userName, board:board}).returning();
-    console.log(result);
+    // console.log(result);
     const res = await db.insert(usersArts).values({userName: body.userName, artId: id});
-    console.log(res);
+    // console.log(res);
     return id
   }, {
     body: t.Object({
@@ -36,9 +39,9 @@ export const art = new Elysia()
   .get('/arts_of_user', async ({ query }) => {
     const {userName} = query;
     const artIds = db.select({ artId: usersArts.artId }).from(usersArts).where(eq(usersArts.userName, userName));
-    console.log(artIds);
+    // console.log(artIds);
     const artsArr: Art[] = await db.select().from(arts).where(inArray(arts.id, artIds));
-    console.log(artsArr);
+    // console.log(artsArr);
     return artsArr
 
   }, {
@@ -52,8 +55,8 @@ export const art = new Elysia()
     const {artId, userName} = query;
     const art: Art = (await db.select().from(arts).where(eq(arts.id, artId)).limit(1))[0];
     const res = await db.insert(usersArts).values({userName, artId});
-    console.log(art);
-    console.log(res);
+    // console.log(art);
+    // console.log(res);
     return art
     }, {
     query: t.Object({

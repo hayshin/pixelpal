@@ -12,9 +12,7 @@
   let showCreateModal = $state(false);
   let showJoinModal = $state(false);
 
-  // Загрузка списка картин при монтировании страницы
-  onMount(async () => {
-    // Загружаем никнейм из локального хранилища
+  function loadName() {
     const storedNickname = localStorage.getItem('username');
     if (storedNickname) {
       userName = storedNickname;
@@ -22,6 +20,10 @@
       // Если никнейма нет, можно предложить его ввести или использовать значение по умолчанию
       // Пока просто оставим поле пустым
     }
+  }
+  // Загрузка списка картин при монтировании страницы
+  onMount(async () => {
+    // Загружаем никнейм из локального хранилища
 
     try {
       const { data, status } = await api.arts_of_user.get({query: {userName: userName}});
@@ -49,12 +51,18 @@
     showCreateModal = false;
   }
 
-  async function handleCreateArt() {
+  async function handleArtCreate(title:string, width: number, height: number) {
     closeCreateModal();
     try {
-      // const newBoard = await createBoard(title, width, height);
+      const {data, status} = await api.arts.post({
+        title, width, height, userName
+      })
+      console.log(data, status);
+      if (data && status == 200) {
+        const artId = data;
+        goto(`/art/${artId}`);
+      }
       // После успешного создания, перенаправляем пользователя на страницу редактирования
-      // goto(`/art/${newBoard.id}`);
       // TODO: Обновить список boards без перезагрузки, если нужно остаться на главной
       // boards = [...boards, newBoard]; // Если хотим добавить в список сразу
     } catch (error) {
@@ -71,11 +79,11 @@
     showJoinModal = false;
   }
 
-  function handleJoinArt() {
+  function handleArtJoin(artId: string) {
     // const { boardId } = event.detail;
     closeJoinModal();
     // Перенаправляем пользователя на страницу редактирования по ID
-    // goto(`/art/${boardId}`);
+    goto(`/art/${artId}`);
     // TODO: Проверить существование доски перед перенаправлением?
     // Это можно сделать через API вызов getBoard(boardId) перед goto
   }
@@ -115,8 +123,8 @@
   {/if}
 </div>
 
-<CreateArtModal bind:show={showCreateModal} bind:userName={userName}/>
-<JoinArtModal bind:show={showJoinModal} bind:userName={userName}/>
+<CreateArtModal bind:show={showCreateModal} bind:userName={userName} handleArtCreate={handleArtCreate}/>
+<JoinArtModal bind:show={showJoinModal} bind:userName={userName} handleArtJoin={handleArtJoin}/>
 
 <style>
   h1, h2 {
