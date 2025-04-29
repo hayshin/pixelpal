@@ -7,10 +7,10 @@
   import {api} from '$lib/eden';
 	import type { Art } from '$shared/types';
 
-  let userName = '';
+  let userName = $state('');
   let arts: Art[] = []; // Массив объектов Art
-  let showCreateModal = false;
-  let showJoinModal = false;
+  let showCreateModal = $state(false);
+  let showJoinModal = $state(false);
 
   // Загрузка списка картин при монтировании страницы
   onMount(async () => {
@@ -49,13 +49,12 @@
     showCreateModal = false;
   }
 
-  async function handleCreateArt(event) {
-    const { title, width, height } = event.detail;
+  async function handleCreateArt() {
     closeCreateModal();
     try {
-      const newBoard = await createBoard(title, width, height);
+      // const newBoard = await createBoard(title, width, height);
       // После успешного создания, перенаправляем пользователя на страницу редактирования
-      goto(`/art/${newBoard.id}`);
+      // goto(`/art/${newBoard.id}`);
       // TODO: Обновить список boards без перезагрузки, если нужно остаться на главной
       // boards = [...boards, newBoard]; // Если хотим добавить в список сразу
     } catch (error) {
@@ -72,11 +71,11 @@
     showJoinModal = false;
   }
 
-  function handleJoinArt(event) {
-    const { boardId } = event.detail;
+  function handleJoinArt() {
+    // const { boardId } = event.detail;
     closeJoinModal();
     // Перенаправляем пользователя на страницу редактирования по ID
-    goto(`/art/${boardId}`);
+    // goto(`/art/${boardId}`);
     // TODO: Проверить существование доски перед перенаправлением?
     // Это можно сделать через API вызов getBoard(boardId) перед goto
   }
@@ -107,8 +106,8 @@
 
 <h2>Ваши картины</h2>
 <div class="board-grid">
-  {#each arts as board (board.id)}
-    <ArtThumbnail {board} />
+  {#each arts as art (art.id)}
+    <ArtThumbnail {art} />
   {/each}
 
   {#if arts.length === 0}
@@ -116,9 +115,8 @@
   {/if}
 </div>
 
-<CreateArtModal show={showCreateModal} on:close={closeCreateModal} on:create={handleCreateArt} />
-<JoinArtModal show={showJoinModal} on:close={closeJoinModal} on:join={handleJoinArt} />
-
+<CreateArtModal bind:show={showCreateModal} bind:userName={userName}/>
+<JoinArtModal bind:show={showJoinModal} bind:userName={userName}/>
 
 <style>
   h1, h2 {

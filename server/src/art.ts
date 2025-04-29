@@ -21,6 +21,8 @@ export const art = new Elysia()
     let board: Board = createMatrix(body.width, body.height, null);
     const result = await db.insert(arts).values({ id: id, title: body.title, height: body.height, width: body.width, owner: body.userName, creater: body.userName, board:board}).returning();
     console.log(result);
+    const res = await db.insert(usersArts).values({userName: body.userName, artId: id});
+    console.log(res);
     return id
   }, {
     body: t.Object({
@@ -47,12 +49,16 @@ export const art = new Elysia()
   })
 
   .get('/arts',async ({ query}) => {
-    const art: Art = (await db.select().from(arts).where(eq(arts.id, query.id)).limit(1))[0];
+    const {artId, userName} = query;
+    const art: Art = (await db.select().from(arts).where(eq(arts.id, artId)).limit(1))[0];
+    const res = await db.insert(usersArts).values({userName, artId});
     console.log(art);
+    console.log(res);
     return art
     }, {
     query: t.Object({
-      id: t.String(),
+      artId: t.String(),
+      userName: t.String()
     }),
     response: Art
   })

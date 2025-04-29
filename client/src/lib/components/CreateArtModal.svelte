@@ -1,17 +1,16 @@
 <script>
-  import { createEventDispatcher } from 'svelte';
+  let {userName=$bindable(), show = $bindable()} = $props();
+  import { api } from "$lib/eden";
 
-  const dispatch = createEventDispatcher();
-
-  export let show = false; // Проп для управления видимостью
-
-  let title = '';
-  let width = 64;
-  let height = 64;
+  let title = $state('');
+  let width = $state(64);
+  let height = $state(64);
 
   function handleSubmit() {
     if (title && width > 0 && height > 0) {
-      dispatch('create', { title, width, height });
+      api.arts.post({
+        title, width, height, userName
+      })
       title = ''; // Сброс формы
       width = 64;
       height = 64;
@@ -19,12 +18,12 @@
   }
 
   function handleClose() {
-    dispatch('close');
+  show=false;
   }
 </script>
 
 {#if show}
-  <div class="modal-backdrop" on:click={handleClose}></div>
+  <div class="modal-backdrop" onclick={handleClose}></div>
   <div class="modal-content">
     <h2>Создать новую картину</h2>
     <label>
@@ -40,8 +39,8 @@
       <input type="number" bind:value={height} min="1" />
     </label>
     <div class="modal-actions">
-      <button on:click={handleSubmit}>Создать</button>
-      <button on:click={handleClose}>Отмена</button>
+      <button onclick={handleSubmit}>Создать</button>
+      <button onclick={handleClose}>Отмена</button>
     </div>
   </div>
 {/if}

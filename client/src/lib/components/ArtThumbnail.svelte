@@ -1,10 +1,10 @@
-<script>
+<script lang=ts>
   import { goto } from '$app/navigation';
-
-  export let art; // Принимаем объект Art как проп
+  import type { Art } from '$shared/types';
+  let {art}: {art: Art} = $props();
 </script>
 
-<button class="art-thumbnail" on:click={() => goto(`/art/${art.id}`)}>
+<button class="art-thumbnail" onclick={() => goto(`/art/${art.id}`)}>
   <h3>{art.title}</h3>
   <p>Размер: {art.width}x{art.height}</p>
   <p>Владелец: {art.owner || 'Неизвестно'}</p>
