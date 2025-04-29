@@ -5,8 +5,8 @@ node_modules
 .vercel
 .netlify
 .wrangler
-.svelte-kit
-build
+/.svelte-kit
+/build
 
 # OS
 .DS_Store
@@ -17,16 +17,7 @@ Thumbs.db
 .env.*
 !.env.example
 !.env.test
-.direnv
-.devenv
-.devenv.flake
-.devenv.flake.nix
-
-sqlite.db
 
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
-
-# SQLite
-*.db
