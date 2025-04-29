@@ -20,7 +20,7 @@ export const arts = sqliteTable("arts", {
   // isPublic: boolean().default(true)
 });
 
-export const usersArts = sqliteTable("user_arts", {
+export const usersArts = sqliteTable("userArts", {
   userName: text().notNull().references(() => users.name),
   artId: text().notNull().references(() => arts.id),
   // socketId: text(),

@@ -8,6 +8,7 @@
     "@elysiajs/swagger": "^1.2.2",
     "drizzle-orm": "^0.43.1",
     "elysia": "latest",
+    "lucide-svelte": "^0.503.0",
     "uuidv4": "^6.2.13"
   },
   "devDependencies": {

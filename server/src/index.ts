@@ -13,8 +13,8 @@ const app = new Elysia()
     {
       origin: true, // Allows all origins (adjust for production)
       methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
-      allowedHeaders: ['Content-Type'], // Allowed headers
-      credentials: true // If you need cookies/auth
+      // allowedHeaders: ['Content-Type'], // Allowed headers
+      // credentials: true // If you need cookies/auth
     }
 
   ))

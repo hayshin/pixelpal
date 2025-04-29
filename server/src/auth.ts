@@ -10,7 +10,7 @@ export const auth = new Elysia()
   .post('/auth', ({ body }) => {
     const query = db.insert(users).values({ name: body.userName });
     const result = db.get<{ text: string }>(query);
-    console.log(result);
+    // console.log(result);
   }, {
     body: t.Object({
       userName: t.String(),
@@ -20,7 +20,7 @@ export const auth = new Elysia()
   .get('/auth', ({ query}) => {
     const q = db.insert(users).values({ name: query.userName });
     const result = db.get<{ text: string }>(q);
-    console.log(result);
+    // console.log(result);
   }, {
     query: t.Object({
       userName: t.String(),
