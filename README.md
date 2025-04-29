@@ -7,7 +7,8 @@
 git clone https://github.com/hayshin/pixelpal.git
 cd pixelpal
 direnv allow # if using devenv
-bun install
+bun get # or manually bun install for root and client directory
+bun dev # or bun client / bun server for running separately
 ```
 ## История создания
 ### 1. Создание канваса

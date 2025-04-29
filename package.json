@@ -2,6 +2,12 @@
   "name": "pixelpal",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "get": "bun install && cd client && bun install && cd ..",
+    "server": "bun run --watch server/src/index.ts",
+    "client": "cd client && bun dev --open",
+    "dev": "bun server & bun client"
+  },
   "dependencies": {
     "@elysiajs/cors": "^1.2.0",
     "@elysiajs/eden": "^1.2.0",

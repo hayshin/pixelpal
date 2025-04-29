@@ -6,8 +6,4 @@ import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 const sqlite = new Database(process.env.DATABASE_URL ?? "sqlite.db");
 // export const db = drizzle(sqlite, { casing: "snake_case" });
 export const db = drizzle(sqlite);
-migrate(db, { migrationsFolder: './drizzle' });
-
-const query = sql`select "hello world" as text`;
-const result = db.get<{ text: string }>(query);
-// console.log(result);
+migrate(db, { migrationsFolder: './server/drizzle' });
