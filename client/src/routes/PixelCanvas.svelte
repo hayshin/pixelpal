@@ -3,13 +3,15 @@
   import type { Point, Pixel } from "../../../shared/types";
   import { api } from "$lib/eden";
 
-  export let width = 64;
-  export let height = 64;
-  export let userName = "anon";
-  export let canvasId = "aboba";
+  let {
+    width = 64,
+    height= 64,
+    userName = "anon",
+    artId,
+    brushColor = "white",
+    brushSize = 1,
+  } = $props();
   const pixelSize = 8;
-  export let brushColor = "#000000";
-  export let brushSize = 1;
 
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
@@ -160,38 +162,50 @@
         clearPixel({ x, y });
       }
     }
-    console.log(canvasId, userName);
+    console.log(artId, userName);
     room = api.canvases.subscribe({
       query: {
-        canvasId,
+        artId,
         userName
       }
     });
-    console.log(canvasId, userName);
+    console.log(artId, userName);
     room.on('message', ({data}) => {
-      drawPixel(data);
+      if (data) {
+        const {pixel, board} = data;
+        if (pixel) {
+        drawPixel(pixel);
+        } else {
+          for (let x = 0; x < width; x++) {
+            for (let y = 0; y < height; y++) {
+              drawPixel({ x, y, color: board[x][y] });
+            }
+    }
+        }
+      }
+      // if(Pixel typeof data) drawPixel(data);
     })
     console.log(room);
   });
 </script>
 
 <canvas
-  bind:this={canvas}
-  {width}
-  {height}
-  onpointermove={handleMouseMove}
-  onpointerdown={handleLeftClick}
-  oncontextmenu={handleRightClick}
-  style="border: 1px solid #ccc; image-rendering: pixelated; width: auto; height:100%;"
+	bind:this={canvas}
+	{width}
+	{height}
+	onpointermove={handleMouseMove}
+	onpointerdown={handleLeftClick}
+	oncontextmenu={handleRightClick}
+	style="border: 1px solid #ccc; image-rendering: pixelated; width: auto; height:100%;"
 ></canvas>
 
 <style>
-  canvas {
-    display: block;
-    width: 100%;
-    height: 100%;
-    border: 1px solid #ccc;
-    image-rendering: pixelated;
-    padding: 10px;
-  }
+	canvas {
+		display: block;
+		width: 100%;
+		height: 100%;
+		border: 1px solid #ccc;
+		image-rendering: pixelated;
+		padding: 10px;
+	}
 </style>

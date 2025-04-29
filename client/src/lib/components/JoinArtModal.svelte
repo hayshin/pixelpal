@@ -1,20 +1,15 @@
-<script>
-  import { createEventDispatcher } from 'svelte';
-
-  const dispatch = createEventDispatcher();
-
-  export let show = false; // Проп для управления видимостью
-
-  let artLink = ''; // Предполагаем, что пользователь введет ссылку или ID
+<script lang=ts>
+  import { api } from "$lib/eden";
+  let {userName=$bindable(), show = $bindable()} = $props();
+  let artLink = $state(''); // Предполагаем, что пользователь введет ссылку или ID
 
   function handleSubmit() {
     if (artLink) {
       // Извлекаем ID из ссылки. Простая реализация: предполагаем, что ID в конце URL
       const parts = artLink.split('/');
-      const boardId = parts[parts.length - 1]; // Получаем последний сегмент
-
-      if (boardId) {
-        dispatch('join', { boardId });
+      const artId = parts[parts.length - 1]; // Получаем последний сегмент
+      api.arts.get({query: {artId, userName}})
+      if (artId) {
         artLink = ''; // Сброс формы
       } else {
         alert('Пожалуйста, введите корректную ссылку или ID картины.');
@@ -23,12 +18,12 @@
   }
 
   function handleClose() {
-    dispatch('close');
+    show = false;
   }
 </script>
 
 {#if show}
-  <div class="modal-backdrop" on:click={handleClose}></div>
+  <div class="modal-backdrop" onclick={handleClose}></div>
   <div class="modal-content">
     <h2>Присоединиться к картине</h2>
     <label>
@@ -36,8 +31,8 @@
       <input type="text" bind:value={artLink} placeholder="Например: http://yoursite.com/art/abcdef12345" />
     </label>
     <div class="modal-actions">
-      <button on:click={handleSubmit}>Присоединиться</button>
-      <button on:click={handleClose}>Отмена</button>
+      <button onclick={handleSubmit}>Присоединиться</button>
+      <button onclick={handleClose}>Отмена</button>
     </div>
   </div>
 {/if}
