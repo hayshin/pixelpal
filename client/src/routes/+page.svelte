@@ -16,7 +16,7 @@
   let isLoading = $state(false);
 
   function loadName() {
-    const storedNickname = localStorage.getItem('pixel_art_nickname');
+    const storedNickname = localStorage.getItem('name');
     userName = storedNickname ?? "anon";
   }
 
@@ -41,10 +41,10 @@
 
   function saveNickname() {
     if (userName) {
-      localStorage.setItem('pixel_art_nickname', userName);
+      localStorage.setItem('name', userName);
       loadArts();
     } else {
-      localStorage.removeItem('pixel_art_nickname');
+      localStorage.removeItem('name');
     }
   }
 
@@ -87,7 +87,7 @@
               id="nickname"
               type="text"
               bind:value={userName}
-              on:blur={saveNickname}
+              on:focusout={saveNickname}
               placeholder="Enter your nickname"
               class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             />

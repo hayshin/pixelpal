@@ -75,8 +75,12 @@ export const websocket = new Elysia()
 
       const board = boards.get(artId);
       if (board && board[pixel.x]?.[pixel.y] !== undefined) {
-        board[pixel.x][pixel.y] = pixel.color;
-        ws.publish(artId, { pixel, board: null });
+        let prevColor = board[pixel.x][pixel.y]
+        if (prevColor != pixel.color) {
+          board[pixel.x][pixel.y] = pixel.color;
+          // console.log(userName, pixel);
+          ws.publish(artId, { pixel, board: null });
+        }
       }
     },
     close(ws) {
@@ -87,7 +91,7 @@ export const websocket = new Elysia()
         const connections = activeConnections.get(artId);
         connections?.delete(ws.id);
 
-          console.log("Trying to update board ", connections?.size)
+        console.log("Trying to update board ", connections?.size)
         if (connections?.size === 0) {
           // Save to database when last connection closes
           console.log("Trying to update board ", artId)

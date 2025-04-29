@@ -71,13 +71,17 @@
 	function drawPixel(pixel: Pixel, native = true) {
 		if (!ctx || !art) return;
 
-		// Ensure pixel coordinates are within bounds before drawing
 		if (pixel.x < 0 || pixel.x >= art.width || pixel.y < 0 || pixel.y >= art.height) {
 			return;
 		}
 
+		if (native && art.board[pixel.x][pixel.y] && art.board[pixel.x][pixel.y] == pixel.color) return;
+
+		if (prevPoint && prevPoint.x == pixel.x && prevPoint.y == pixel.y) return;
+
 		if (room && native) room.send(pixel);
 
+		// console.log(pixel);
 		if (pixel.color) {
 			ctx.fillStyle = pixel.color;
 			// Draw a single pixel at the specified coordinate, brush size is handled in drawLine
@@ -150,6 +154,7 @@
 			let events = event.getCoalescedEvents();
 			for (const e of events) {
 				const pixelCoords = getPixelCoords(e);
+				if (pixelCoords == prevPoint) continue;
 				const color = isDrawing ? brushColor : undefined; // Use undefined for erasing
 
 				if (prevPoint) {
@@ -210,6 +215,7 @@
 				if (pixel) {
 					// Draw a single received pixel
 					drawPixel(pixel, false);
+					if (art) art.board[pixel.x][pixel.y] = pixel.color;
 				} else if (board) {
 					// Redraw the entire board if received
 					for (let x = 0; x < art!.width; x++) {
