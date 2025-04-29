@@ -24,11 +24,14 @@ export const Board = t.Array(t.Array(Color));
 export type Board = Static<typeof Board>
 
 export const Art = t.Object({
+  id: t.String(),
+  title: t.String(),
   width: t.Number(),
   height: t.Number(),
-  title: t.String(),
-  owner: t.String(),
   created: t.Date(),
+  updated: t.Date(),
+  owner: t.String(),
+  creater: t.String(),
   board: Board,
 })
 export type Art = Static<typeof Art>

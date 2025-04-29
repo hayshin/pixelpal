@@ -12,5 +12,8 @@ export const add = new Elysia()
       a: t.Integer(),
       b: t.Integer(),
     }),
+    response: t.Object({
+      total: t.Number()
+    })
   })
 

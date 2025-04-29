@@ -4,25 +4,26 @@ import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 export const users = sqliteTable("users", {
   name: text().notNull().primaryKey(),
   password: text(),
-  createdAt: integer({mode: 'timestamp'}).notNull().default(sql`(unixepoch())`),
+  created: integer({mode: 'timestamp'}).notNull().default(sql`(unixepoch())`),
 });
 
-export const canvases = sqliteTable("users", {
+export const arts = sqliteTable("arts", {
   id: text().primaryKey(),
+  title: text().notNull(),
   height: integer().notNull(),
-  widht: integer().notNull(),
-  createdAt: integer({mode: 'timestamp'}).notNull().default(sql`(unixepoch())`),
-  updatedAt: integer({mode: 'timestamp'}).default(sql`(unixepoch())`),
-  ownerName: text().notNull().references(() => users.name),
-  createrName: text().notNull().references(() => users.name),
-  state: text(),
+  width: integer().notNull(),
+  created: integer({mode: 'timestamp'}).notNull().default(sql`(unixepoch())`),
+  updated: integer({mode: 'timestamp'}).notNull().default(sql`(unixepoch())`),
+  owner: text().notNull().references(() => users.name),
+  creater: text().notNull().references(() => users.name),
+  board: text({mode: "json"}).$type<(string | undefined | null)[][]>().default(sql`(json_array())`).notNull(),
   // isPublic: boolean().default(true)
 });
 
-export const active_users = sqliteTable("users", {
+export const usersArts = sqliteTable("user_arts", {
   userName: text().notNull().references(() => users.name),
-  canvasId: text().notNull().references(() => canvases.id),
-  socketId: text(),
+  artId: text().notNull().references(() => arts.id),
+  // socketId: text(),
   // isPublic: boolean().default(true)
 });
 
