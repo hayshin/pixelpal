@@ -1,7 +1,0 @@
-/home/hayshin/dev/pixelpal/.devenv/flake.json
-/home/hayshin/dev/pixelpal/.devenv.flake.nix
-/home/hayshin/dev/pixelpal/.env
-/home/hayshin/dev/pixelpal/devenv.local.nix
-/home/hayshin/dev/pixelpal/devenv.lock
-/home/hayshin/dev/pixelpal/devenv.nix
-/home/hayshin/dev/pixelpal/devenv.yaml
